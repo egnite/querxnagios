@@ -13,6 +13,7 @@ import (
 
 type querxCheck struct {
 	params querxnagios.Parameters
+	paramErr error
 	hostname string
 	sensor querx.Sensor
 	value float64
@@ -30,12 +31,14 @@ func (check *querxCheck) HandleArguments(options monitoringplugin.PluginOpt) (mo
 
 	check.warnRange, err = monitoringplugin.NewRange(*params.Warning)
 	if err != nil {
-		return options, err
+		check.paramErr = err
+		return options, nil
 	}
 
 	check.critRange, err = monitoringplugin.NewRange(*params.Critical)
 	if  err != nil {
-		return options, err
+		check.paramErr = err
+		return options, nil
 	}
 	//fmt.Printf("WARN: %v  CRIT: %v\n", check.warnRange, check.critRange)
 
@@ -43,19 +46,22 @@ func (check *querxCheck) HandleArguments(options monitoringplugin.PluginOpt) (mo
 	querx := querx.NewQuerx(*params.Hostname, *params.Port, false)
 	err = querx.QueryCurrent()
 	if err != nil {
-		return options, fmt.Errorf("Could not establish connection to "+*params.Hostname)
+		check.paramErr = fmt.Errorf("Could not establish connection to "+*params.Hostname)
+		return options, nil
 	}
 
 	//Get parameters for check
 	sensor, err := querx.SensorByID(*params.SensorID)
 	if err != nil {
-		return options, fmt.Errorf("Failed to query sensor "+strconv.Itoa(*params.SensorID))
+		check.paramErr = fmt.Errorf("Failed to query sensor "+strconv.Itoa(*params.SensorID))
+		return options, nil
 	}
 	check.sensor = sensor
 	check.value, err = querx.CurrentValue(sensor)
 	check.hostname = querx.Current.Hostname
 	if err != nil {
-		return options, fmt.Errorf("Could not query current Readings from sensor "+strconv.Itoa(*params.SensorID))
+		check.paramErr = fmt.Errorf("Could not query current Readings from sensor "+strconv.Itoa(*params.SensorID))
+		return options, nil
 	}
 
 	options.Timeout = time.Duration(60) * time.Second
@@ -85,11 +91,14 @@ func (check *querxCheck) Run() (result monitoringplugin.CheckResult) {
 	checkResult := monitoringplugin.NewDefaultCheckResult(nil)
 	result = checkResult
 
+	if check.paramErr != nil {
+		checkResult.SetResult(monitoringplugin.UNKNOWN, fmt.Sprintf("%s", check.paramErr))
+		return
+	}
+
 	sensor := check.sensor
 	params := check.params
 	//fmt.Printf("Parameters %v\n", params)
-
-
 
 	//Check critical values
 	if params.UseDeviceLimits {
