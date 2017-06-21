@@ -29,19 +29,19 @@ type Parameters struct {
 }
 
 func (p *Parameters) Parse() {
-	p.Hostname = getopt.StringLong("hostname", 'H', "", "Hostname or IP address")
-	p.Port = getopt.IntLong("port", 'P', 80, "HTTP port")
+	p.Hostname = getopt.StringLong("hostname", 'H', "", "Hostname or IP address", "ip")
+	p.Port = getopt.IntLong("port", 'P', 80, "HTTP port", "port")
 	//p.TLS = getopt.BoolLong("tls", 't', "Connect via TLS")
 	//p.Auth = getopt.BoolLong("auth", 'a', "Use Authentification")
 	//p.Username = getopt.StringLong("user", 'u', "", "User name")
 	//p.Password = getopt.StringLong("password", 'p', "", "Password")
-	p.Verbosity = getopt.CounterLong("verbose", 'v', "1", "Verbosity level")
+	p.Verbosity = getopt.CounterLong("verbose", 'v', "Verbosity level")
 	p.Help = getopt.BoolLong("help", 'h', "Print help screen")
 	p.Version = getopt.BoolLong("version", 'V', "Print version")
 	p.Critical = getopt.StringLong("critical", 'c', "", "Critical threshold", "range")
 	p.Warning = getopt.StringLong("warning", 'w', "", "Warning threshold", "range")
 	p.Messages = make([]string, 4)
-	p.SensorID = getopt.IntLong("sensor", 's', 0, "Sensor ID")
+	p.SensorID = getopt.IntLong("sensor", 's', 0, "Sensor ID", "id")
 	p.Failed = false
 	getopt.Parse()
 
