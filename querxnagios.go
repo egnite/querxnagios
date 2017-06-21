@@ -7,7 +7,7 @@ import (
 	"github.com/pborman/getopt/v2"
 )
 
-const Version string = "1.1"
+const Version string = "1.2"
 
 type Parameters struct {
 	Hostname *string
