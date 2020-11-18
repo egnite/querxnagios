@@ -1,4 +1,4 @@
-# querxnagios v1.2
+# querxnagios v1.3
 Interact with Querx Smart Ethernet Sensors using Go (golang)
 
 ## compile
