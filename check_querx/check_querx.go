@@ -56,6 +56,10 @@ func (check *querxCheck) HandleArguments(options monitoringplugin.PluginOpt) (mo
 		check.paramErr = fmt.Errorf("Failed to query sensor "+strconv.Itoa(*params.SensorID))
 		return options, nil
 	}
+	if (sensor.Status & 128) != 0 {
+		check.paramErr = fmt.Errorf("Sensor error for sensor "+strconv.Itoa(*params.SensorID))
+		return options, nil
+	}
 	check.sensor = sensor
 	check.value, err = querx.CurrentValue(sensor)
 	check.hostname = querx.Current.Hostname
